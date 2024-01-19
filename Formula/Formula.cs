@@ -62,20 +62,20 @@ namespace Formula;
 /// </summary>
 public class Formula
 {
-    private const char Space = ' ';
-    private const string ProduceMark = " -> ";
-    private const string DivideMark = ", ";
+    private const char Space = ' ';                 // the space character
+    private const string ProduceMark = " -> ";      // the string " -> "
+    private const string DivideMark = ", ";         // the string ", "
     
-    private const int Default = 0;
-    private const int Error = -1;
+    private const int Default = 0;                  // default integer value (0)
+    private const int Error = -1;                   // error condition
     
-    private const int Level = 1;
-    private const int Range = 5;
-    private const int MaxLevel = 5;
+    private const int Level = 1;                   // starting proficiency level
+    private const int Range = 5;           // the range for proficiency level up
+    private const int MaxLevel = 5;        // the maximum proficiency level
     
     private class Material
     {
-        private readonly string _name;
+        private readonly string _name; 
         private readonly int _quantity;
 
             
