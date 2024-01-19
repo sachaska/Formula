@@ -14,10 +14,10 @@
  *      For each material, the constructor checks if the provided quantity is
  *      greater than zero, and creates a new Material instance.
  * 
- *      Upon user providing materials to the Formula, it calculates the
- *      conversion probabilities and potential output materials based on
- *      the stored manufacturing probabilities (_probability array)
- *      and efficiencies (_produceRate array).
+ *      Upon stored relationship (_inputMaterials and _outputMaterials),
+ *      it calculates the conversion probabilities and potential output
+ *      materials based on the stored manufacturing probabilities
+ *      (_probability array) and efficiencies (_produceRate array).
  * 
  *      The user can interact further with the instance of Formula by calling
  *      the other methods to check the current proficiency level, retrieve
@@ -82,6 +82,7 @@ public class Formula
         // - Constructor:
         /*     ** Precondition:
         *          The input string should be in the format.
+        *          number part should greater than zero.
         *      ** Postcondition:
         *          A Material instance is created with provided name
         *         and quantity.
@@ -94,8 +95,18 @@ public class Formula
             {
                 string numStr = input.Substring(Default, index);
                 string name = input.Substring(index + 1);
+                
+                if (int.Parse(numStr) <= 0)
+                {
+                    throw new Exception("Create Material instance " +
+                                        $"{name} " +
+                                        "failed. Quantity should greater than" +
+                                        "zero.");
+                }
+                
                 _name = name;
                 _quantity = int.Parse(numStr);
+                
             }
             
             else
@@ -114,6 +125,13 @@ public class Formula
         */
         public Material(string name, int quantity)
         {
+            if (quantity <= 0)
+            {
+                throw new Exception("Create Material instance " +
+                                    $"{name} " +
+                                    "failed. Quantity should greater than" +
+                                    "zero.");
+            }
             _name = name;
             _quantity = quantity;
 
@@ -148,10 +166,6 @@ public class Formula
 
     private readonly Material[] _outputMaterials;
 
-    private Material[]? _userInputMaterials;
-
-    private Material[]? _formulaOutputMaterials;
-
     private static int _convertCount;
 
     private int _proficiency;
@@ -181,35 +195,10 @@ public class Formula
                                 + "Names and quantity not pair.");
         
         for (int i = 0; i < inNames.Length; i++)
-        {
-            if (inQuantity[i] > 0)
-            {
-                _inputMaterials[i] = new Material(inNames[i], inQuantity[i]);
-            }
-            else if (inQuantity[i] < 0)
-            {
-                throw new Exception($"Initialize Formula instance " +
-                                    $"failed." + $" Invalid {inNames[i]} " +
-                                    $"quantity.");
-            }
-        }
+            _inputMaterials[i] = new Material(inNames[i], inQuantity[i]);
         
         for (int i = 0; i < outNames.Length; i++)
-        {
-            if (outQuantity[i] > 0)
-            {
-                _outputMaterials[i] = new Material(outNames[i], outQuantity[i]);
-            }
-            else if (outQuantity[i] < 0)
-            {
-                throw new Exception($"Initialize Formula instance " +
-                                    $"failed." + $" Invalid {outNames[i]} " +
-                                    $"quantity.");
-            }
-        }
-        
-        OrderList(_inputMaterials);
-        OrderList(_outputMaterials);
+            _outputMaterials[i] = new Material(outNames[i], outQuantity[i]);
         
         // Initialize convert count
         _convertCount = Default;
@@ -255,20 +244,6 @@ public class Formula
         // Initialize produce proficiency
         _proficiency = Level;
     }
-    
-    // -‘OrderList’
-    /*      Sorts the given list of materials alphabetically.
-     *      ** Precondition:
-     *          The input list should not be null.
-     *      ** Postcondition:
-     *          The input list is sorted alphabetically.
-     */
-    private void OrderList(Material[] list)
-    {
-        // Sort by alphabet order
-        Array.Sort(list, (m1, m2) => 
-            string.Compare(m1.Name, m2.Name, StringComparison.Ordinal));
-    }
 
     // -‘Normalize’
     /*      Converts the input string into an array of Material instances.
@@ -290,9 +265,7 @@ public class Formula
         {
             materials[i] = new Material(inputList[i]);
         }
-
-        OrderList(materials);
-
+        
         return materials;
     }
 
@@ -372,94 +345,18 @@ public class Formula
             _currentProbability[FullProb] += change;
             _currentProbability[ExtraProb] += change;
         }
+        
     }
 
     // -‘Apply’ 
-    /*      Applies the formula to user-provided input materials and returns the
-     *      simulation result.
+    /*      Applies the formula and returns the simulation result.
      *      ** Precondition:
      *          The input arrays should match in length, and quantities should
      *          be positive.
      *      ** Postcondition:
      *          The simulation result is returned as a string.
      */
-    public string Apply(string[] inputNames, int[] inputQuantity)
-    {
-        
-        if (inputNames.Length == inputQuantity.Length)
-            _userInputMaterials = new Material[inputNames.Length];
-        
-        else
-            throw new Exception("SIMULATION FAILED. " +
-                                "names and numbers not pair.");
-
-        for (int i = 0; i < inputNames.Length; i++)
-        {
-            if (inputQuantity[i] > 0)
-            {
-                _userInputMaterials[i] = new Material(inputNames[i],
-                    inputQuantity[i]);
-            }
-            else if (inputQuantity[i] < 0)
-            {
-                throw new Exception("SIMULATION FAILED. " 
-                                    + $" Invalid {inputNames[i]} " +
-                                    $"quantity.");
-            }
-            
-        }
-        
-        OrderList(_userInputMaterials);
-        
-        StringBuilder stringBuilder = new StringBuilder();
-
-        // Show current Proficiency with result
-        stringBuilder.Append(Proficiency).Append('\n');
-
-        // Compare to formula 'input materials'
-        if (Compare())
-            stringBuilder.Append(Simulation());
-        
-        return stringBuilder.ToString();
-    
-    }
-    
-    // -‘Apply’
-    /*      Applies the formula to user-provided input materials and returns the
-     * simulation result.
-     *      ** Precondition:
-     *          The input string should be in the format
-     * "inputMaterials -> outputMaterials".
-     *      ** Postcondition:
-     *          The user-provided input materials are applied to the formula,
-     * and the simulation result is returned as a string.
-     */
-    public string Apply(string input)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        // Show current Proficiency with result
-        stringBuilder.Append(Proficiency).Append('\n');
-        
-        // Get user input
-        _userInputMaterials = Normalize(input);
-        
-        // Compare to formula 'input materials'
-        if (Compare())
-            stringBuilder.Append(Simulation());
-        
-        return stringBuilder.ToString();
-    }
-
-    // -‘Simulation’
-    /*      Simulates the production process and returns the simulation result.
-     *      ** Precondition:
-     *          None.
-     *      ** Postcondition:
-     *          The production process is simulated, and the result is returned
-     *          as a string.
-     */
-    private string Simulation()
+    public string Apply()
     {
         StringBuilder stringBuilder = new StringBuilder();
         
@@ -471,37 +368,13 @@ public class Formula
             
         if (rate != _produceRate[FailProb])
         {
-            // Find the smallest quotient.
-            int smallest = _userInputMaterials[Default].Quantity /
-                           _inputMaterials[Default].Quantity;
-            
-            for (int i = 1; i < _inputMaterials.Length; i++)
+            for (int i = 0; i < _outputMaterials.Length; i++)
             {
-                int current = _userInputMaterials[i].Quantity / 
-                              _inputMaterials[i].Quantity;
-                if (current < smallest)
-                    smallest = current;
-            }
-
-            if (smallest > 0)
-            {
-                double multiple = smallest * rate;
-                
-                _formulaOutputMaterials = 
-                    new Material[_outputMaterials.Length];
-                
-                for (int i = 0; i < _outputMaterials.Length; i++)
-                {
-                    _formulaOutputMaterials[i] = 
-                        new Material(_outputMaterials[i].Name, 
-                            (int) 
-                            (_outputMaterials[i].Quantity * multiple));
-                }
-                    
-                foreach (Material mate in _formulaOutputMaterials)
-                {
-                    stringBuilder.Append(mate);
-                }
+                if (i != 0)
+                    stringBuilder.Append(", ");
+                stringBuilder.Append($"{(int)(_outputMaterials[i].Quantity * 
+                            rate)}" +
+                                     $" {_outputMaterials[i].Name}");
             }
         }
             
@@ -509,41 +382,7 @@ public class Formula
             stringBuilder.Append("N/A");
 
         return stringBuilder.ToString();
-    }
-
-    // -‘Compare’
-    /*      Compares user-provided input materials with formula input materials.
-     *      ** Precondition:
-     *          The user input and formula input materials should match in
-     *          type and quantity.
-     *      ** Postcondition:
-     *          Returns true if the comparison is successful.
-     */
-    private bool Compare()
-    {
-        const bool equal = true;
-
-        if (_userInputMaterials == null)
-            throw new Exception("CANNOT SIMULATE. " +
-                                "User input resource null.");
-
-        if (_inputMaterials.Length > _userInputMaterials.Length)
-            throw new Exception("CANNOT SIMULATE. " +
-                                "Too much type of input resources.");
-
-        if (_inputMaterials.Length < _userInputMaterials.Length)
-            throw new Exception("CANNOT SIMULATE. " +
-                                "Not enough type of input resources.");
-        
-        for (int i = 0; i < _inputMaterials.Length; i++)
-        {
-            if (_inputMaterials[i].Name != _userInputMaterials[i].Name)
-                throw new Exception("CANNOT SIMULATE. " +
-                                    "Incorrect resource name: " +
-                                    $"**{_userInputMaterials[i].Name}**");
-        }
-
-        return equal;
+    
     }
 
     // -‘ToString’
@@ -592,7 +431,9 @@ public class Formula
   Implementation Invariants:
         1. All Material quantities in _inputMaterials and _outputMaterials are 
          positive.
-        2. _produceRate and _probability are always of length 4.
+        2. _produceRate and _probability are always of length 4 (4 states) and
+        should be unsigned.
         3. _proficiency is always a positive value within the range specified by
          Level and MaxLevel constants.
+        4. maximum _proficiency is 5.
   */
