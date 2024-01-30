@@ -51,21 +51,6 @@ public class FormulaTest
         
         Console.WriteLine("(TEST PASSED)");
         
-        Console.WriteLine("\n2.    public Formula(string input)");
-        
-        // Arrange
-        string input = "2 iron ore -> 1 iron bar";
-        Console.WriteLine($"INPUT DATA: {input}");
-        
-        // Act
-        TestDelegate act2 = () => 
-            new Formula(input);
-        
-        // Assert
-        Assert.DoesNotThrow(act2);
-        
-        Console.WriteLine("(TEST PASSED)");
-        
         Console.WriteLine("***********************TEST " +
                           "END***********************");
     }
@@ -97,16 +82,6 @@ public class FormulaTest
             formula1.ToString());
         
         Console.WriteLine("TO STRING METHOD RETURNED:\n" + formula1);
-
-        string input = "2 iron ore -> 1 iron bar";
-        Console.WriteLine($"INPUT DATA: {input}");
-        
-        Formula formula2 = new Formula(input);
-        
-        Console.WriteLine("TO STRING METHOD RETURNED:\n" + formula2);
-
-        ClassicAssert.AreEqual("2 iron ore -> 1 iron bar", 
-            formula2.ToString());
         
         Console.WriteLine("(TEST PASSED)");
         
@@ -140,40 +115,11 @@ public class FormulaTest
         Assert.Throws<Exception>(bad_act1, "Names and quantity not pair.");
         
         Console.WriteLine("1. (Names and quantity not pair PASSED)");
-
-        // Arrange
-        string bad_input = "1000 water, 999 hydrogen, 1 deuterium"; 
-        // missing " -> " in the input string
-
-        // Act
-        TestDelegate bad_act2 = () => new Formula(bad_input);
-
-        // Assert
-        Assert.Throws<Exception>(bad_act2, 
-            "Initialize Formula instance failed.");
         
         Console.WriteLine("INPUT DATA: " +
                           "1000 water, 999 hydrogen, 1 deuterium");
         
         Console.WriteLine("2. (Initialize Formula instance failed PASSED)");
-        
-        // Arrange
-        string bad_number = "-1000 water, 999 hydrogen, 1 deuterium"; 
-        
-        Console.WriteLine("INPUT DATA: " +
-                          $"{bad_number}");
-        
-        // Act
-        TestDelegate bad_act3 = () => new Formula(bad_input);
-        
-        // Assert
-        Assert.Throws<Exception>(bad_act3, 
-            "Create Material instance " +
-                                        "water " +
-                                        "failed. Quantity should greater than" +
-                                        "zero.");
-        
-        Console.WriteLine("3. (Quantity should greater than zero PASSED)");
         
         Console.WriteLine("***********************TEST " +
                           "END***********************");
@@ -193,7 +139,14 @@ public class FormulaTest
         Console.WriteLine("***********************TEST " +
                           "LEVEL UP AND PROFICIENCY***********************");
         // Arrange
-        var formula = new Formula("3 iron ore, 1 coal -> 1 steel bar");
+        // Arrange
+        string[] inNames = { "butter", "egg", "sugar" };
+        int[] inQuantity = { 2, 3, 1 };
+        string[] outNames = { "cookies" };
+        int[] outQuantity = { 36 };
+        
+        Formula formula = new Formula(inNames, inQuantity, 
+            outNames, outQuantity);
         
         // Act
         string proficiency;

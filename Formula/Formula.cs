@@ -4,6 +4,8 @@
 
 // Revision History:
 /*      - 2023, Jan 18 Ai Sun - Initial creation of the class.
+        - 2023, Jan 30 Ai Sun - Add comments and minimize the number of
+        constructor.
  */
 
 // Process:
@@ -73,47 +75,15 @@ public class Formula
     private const int Range = 5;           // the range for proficiency level up
     private const int MaxLevel = 5;        // the maximum proficiency level
     
+    /// <summary>
+    /// Class representing a material.
+    /// Class Invariant: Name should be not null and quantity must always be 
+    /// non-negative. If input in one string, the string should fit the format.
+    /// </summary>
     private class Material
     {
-        private readonly string _name; 
-        private readonly int _quantity;
-
-            
-        // - Constructor:
-        /*     ** Precondition:
-        *          The input string should be in the format.
-        *          number part should greater than zero.
-        *      ** Postcondition:
-        *          A Material instance is created with provided name
-        *         and quantity.
-        */
-        public Material(string input)
-        {
-            int index = input.IndexOf(Space);
-            
-            if (index != Error)
-            {
-                string numStr = input.Substring(Default, index);
-                string name = input.Substring(index + 1);
-                
-                if (int.Parse(numStr) <= 0)
-                {
-                    throw new Exception("Create Material instance " +
-                                        $"{name} " +
-                                        "failed. Quantity should greater than" +
-                                        "zero.");
-                }
-                
-                _name = name;
-                _quantity = int.Parse(numStr);
-                
-            }
-            
-            else
-                throw new Exception("Create Material instance failed." +
-                                    " Invalid input format.");
-            
-        }
+        private readonly string _name;      // holds material name
+        private readonly int _quantity;     // holds material quantity
         
         // - Constructor
         /*     ** Precondition:
@@ -210,65 +180,6 @@ public class Formula
         _proficiency = Level;
 
     }
-
-    // - Constructor
-    /*      ** Precondition:
-     *          The input string should be in the format "
-     *          inputMaterials -> outputMaterials".
-     *      ** Postcondition:
-     *          A Formula instance is created with initialized input and output
-     *          materials.
-     */
-    public Formula(string input)
-    {
-        // Process user input
-        string[] collection = input.ToLowerInvariant()
-            .Split(new string[]{ProduceMark}, StringSplitOptions.None);
-        
-        // Initialize formula input/output materials names and numbers
-        if (collection.Length == 2)
-        {
-            _inputMaterials = Normalize(collection[0]);
-            _outputMaterials = Normalize(collection[1]);
-        }
-        
-        else
-            throw new Exception("Initialize Formula instance failed.");
-
-        // Initialize convert count
-        _convertCount = Default;
-        
-        // Initialize produce probability
-        _currentProbability = _probability;
-        
-        // Initialize produce proficiency
-        _proficiency = Level;
-    }
-
-    // -‘Normalize’
-    /*      Converts the input string into an array of Material instances.
-     *      ** Precondition:
-     *          The input string should be in the format
-     *          "quantity1 name1, quantity2 name2, ...".
-     *      ** Postcondition:
-     *          Returns an array of Material instances based on the input
-     *          string.
-     */
-    private Material[] Normalize(string input)
-    {
-        string[] inputList = input.Split(new string[] { DivideMark }, 
-            StringSplitOptions.None);
-        
-        Material[] materials = new Material[inputList.Length];
-        
-        for (int i = 0; i < inputList.Length; i++)
-        {
-            materials[i] = new Material(inputList[i]);
-        }
-        
-        return materials;
-    }
-
     
     // -‘Produce’
     /*      Simulates the production process and returns the produce rate.
