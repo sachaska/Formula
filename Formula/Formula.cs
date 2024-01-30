@@ -64,12 +64,7 @@ namespace Formula;
 /// </summary>
 public class Formula
 {
-    private const char Space = ' ';                 // the space character
-    private const string ProduceMark = " -> ";      // the string " -> "
-    private const string DivideMark = ", ";         // the string ", "
-    
     private const int Default = 0;                  // default integer value (0)
-    private const int Error = -1;                   // error condition
     
     private const int Level = 1;                   // starting proficiency level
     private const int Range = 5;           // the range for proficiency level up
@@ -95,7 +90,7 @@ public class Formula
         */
         public Material(string name, int quantity)
         {
-            if (quantity <= 0)
+            if (quantity <= Default)
             {
                 throw new Exception("Create Material instance " +
                                     $"{name} " +
@@ -130,7 +125,7 @@ public class Formula
     
     const int FailProb = 0, PartProb = 1, FullProb = 2, ExtraProb = 3;
 
-    private double[] _currentProbability;
+    private readonly double[] _currentProbability;
 
     private readonly Material[] _inputMaterials;
 
@@ -164,10 +159,10 @@ public class Formula
             throw new Exception("Initialize Formula instance failed."
                                 + "Names and quantity not pair.");
         
-        for (int i = 0; i < inNames.Length; i++)
+        for (int i = Default; i < inNames.Length; i++)
             _inputMaterials[i] = new Material(inNames[i], inQuantity[i]);
         
-        for (int i = 0; i < outNames.Length; i++)
+        for (int i = Default; i < outNames.Length; i++)
             _outputMaterials[i] = new Material(outNames[i], outQuantity[i]);
         
         // Initialize convert count
@@ -279,9 +274,9 @@ public class Formula
             
         if (rate != _produceRate[FailProb])
         {
-            for (int i = 0; i < _outputMaterials.Length; i++)
+            for (int i = Default; i < _outputMaterials.Length; i++)
             {
-                if (i != 0)
+                if (i != Default)
                     stringBuilder.Append(", ");
                 stringBuilder.Append($"{(int)(_outputMaterials[i].Quantity * 
                             rate)}" +
@@ -310,7 +305,7 @@ public class Formula
         
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < _inputMaterials.Length; i++)
+        for (int i = Default; i < _inputMaterials.Length; i++)
         {
             if (i == first)
                 stringBuilder.Append(_inputMaterials[i]);
@@ -322,7 +317,7 @@ public class Formula
 
         stringBuilder.Append(" -> ");
         
-        for (int i = 0; i < _outputMaterials.Length; i++)
+        for (int i = Default; i < _outputMaterials.Length; i++)
         {
             if (i == first)
                 stringBuilder.Append(_outputMaterials[i]);
