@@ -6,6 +6,10 @@
 /*      - 2023, Jan 18 Ai Sun - Initial creation of the class.
         - 2023, Jan 30 Ai Sun - Add comments and minimize the number of
         constructor.
+        - 2023, Jan 31 Ai Sun - change Clients should be able to increase 
+                                proficiency up to some maximum.
+                                add empty exception.
+                                delete variable convert count.
  */
 
 // Process:
@@ -22,8 +26,8 @@
  *      (_probability array) and efficiencies (_produceRate array).
  * 
  *      The user can interact further with the instance of Formula by calling
- *      the other methods to check the current proficiency level, retrieve
- *      the list of materials for conversion.
+ *      the other methods to check or set the current proficiency level,
+ *      or retrieve the list of materials for conversion.
  */
 
 // Assumptions:
@@ -34,10 +38,17 @@
  *      be positive.
  * 
  *      3. The _produceRate and _probability arrays are always of length 4.
+ *
+ *      4. Proficiency should always be integer,
+ *      in the range of 0 to 4 (include 4).
  */
 
 // Use and Validity (Error Processing):
 /*      The Formula class validates its input in several ways:
+ *          - If input name is empty, an exception is thrown.
+ *
+ *          - If input quantity is empty, an exception is thrown.
+ * 
  *          - If the input names' length does not match their respective
  *          quantities, an exception is thrown.
  *
@@ -66,19 +77,21 @@ public class Formula
 {
     private const int Default = 0;                  // default integer value (0)
     
-    private const int Level = 1;                   // starting proficiency level
-    private const int Range = 5;           // the range for proficiency level up
-    private const int MaxLevel = 5;        // the maximum proficiency level
-    
+    private const int Level = 0;                   // starting proficiency level
+    private const int MaxLevel = 4;        // the maximum proficiency level
+    private const int MinLevel = 0;        // the minimum proficiency level
+    private const int UpdateValue = 5;     // for update probability
     /// <summary>
     /// Class representing a material.
-    /// Class Invariant: Name should be not null and quantity must always be 
-    /// non-negative. If input in one string, the string should fit the format.
+    /// Class Invariant: Name and quantity shouldn't be null.
+    /// quantity must always be non-negative. 
     /// </summary>
     private class Material
     {
         private readonly string _name;      // holds material name
         private readonly int _quantity;     // holds material quantity
+
+        private const int NonPositive = 0;
         
         // - Constructor
         /*     ** Precondition:
@@ -90,13 +103,24 @@ public class Formula
         */
         public Material(string name, int quantity)
         {
-            if (quantity <= Default)
+            // error checking for constructor null inputs or output names 
+            if (string.IsNullOrEmpty(name))
             {
-                throw new Exception("Create Material instance " +
-                                    $"{name} " +
-                                    "failed. Quantity should greater than" +
-                                    "zero.");
+                throw new ArgumentNullException("Create " +
+                                                "Material instance " + 
+                                                $"{name} " + "failed. "
+                                                + "No name provide" );
             }
+            
+            // error checking for constructor invalid numbers 
+            if (quantity <= NonPositive)
+            {
+                throw new InvalidDataException("Create Material " +
+                                               "instance " + $"{name} failed. " +
+                                               $"Quantity should greater than " +
+                                               "zero.");
+            }
+            
             _name = name;
             _quantity = quantity;
 
@@ -115,28 +139,57 @@ public class Formula
             return $"{Quantity} {Name}";
         }
 
-        public string Name => _name;
-        public int Quantity => _quantity;
+        public string Name => _name;        // getter of name
+        public int Quantity => _quantity;   // getter of quantity
     }
 
+    // default produce rate
     private readonly double[] _produceRate = [0, 0.75, 1, 1.1];
 
+    // default probability
     private readonly double[] _probability = [25, 20, 50, 5];
     
+    // index of each probability
     const int FailProb = 0, PartProb = 1, FullProb = 2, ExtraProb = 3;
 
+    // holds current probability
     private readonly double[] _currentProbability;
 
+    // holds formula input materials
     private readonly Material[] _inputMaterials;
 
+    // holds formula output materials
     private readonly Material[] _outputMaterials;
 
-    private static int _convertCount;
-
+    // holds current proficiency
     private int _proficiency;
+    
+    // set and get proficiency
+    public int Proficiency
+    {
+        set
+        {
+            int lastProf = _proficiency;
+            
+            if (value is < MinLevel or > MaxLevel)
+            {
+                throw new InvalidDataException("Proficiency " +
+                                               "valid range [0, 4].");
+            }
+            
+            _proficiency = value;
 
-    public string Proficiency => 
-        $"CURRENT PROFICIENCY: LEVEL {_proficiency.ToString()}";
+            if (_proficiency != lastProf)
+            {
+                int change = _proficiency - lastProf;
+                
+            }
+        }
+
+        get => _proficiency;
+    }
+    
+    
 
     // - Constructor
     /*      ** Precondition:
@@ -149,6 +202,20 @@ public class Formula
     public Formula(string[] inNames, int[] inQuantity, 
         string[] outNames, int[] outQuantity)
     {
+        if (inNames.Length == Default || outNames.Length == Default)
+        {
+            throw new InvalidDataException("Initialize" +
+                                           " Formula instance failed." +
+                                           " Names should not be null.");
+        }
+        
+        if (inQuantity.Length == Default || outQuantity.Length == Default)
+        {
+            throw new InvalidDataException("Initialize" +
+                                           " Formula instance failed." +
+                                           " No data in quantity.");
+        }
+        
         if (inNames.Length == inQuantity.Length && 
             outNames.Length == outQuantity.Length)
         {
@@ -164,9 +231,6 @@ public class Formula
         
         for (int i = Default; i < outNames.Length; i++)
             _outputMaterials[i] = new Material(outNames[i], outQuantity[i]);
-        
-        // Initialize convert count
-        _convertCount = Default;
         
         // Initialize produce probability
         _currentProbability = _probability;
@@ -214,37 +278,27 @@ public class Formula
             // Produce 110%
             rate = _produceRate[ExtraProb];
 
-        // Add success convert count
-        _convertCount++; 
-        
-        // If reached, level up
-        if (_convertCount % Range == Default)
-            LevelUp();
-
         return rate;
     }
 
-    // -‘LevelUp’
-    /*      Increases the proficiency level and adjusts the production
-     *      probabilities accordingly.
+    // -‘UpdateProbability’
+    /*      Adjusts the production probabilities accordingly.
      *      ** Precondition:
-     *          None.
+     *          proficiency level has changed.
      *      ** Postcondition:
-     *          The proficiency level is increased, and probabilities are
-     *          adjusted.
+     *         The probabilities are adjusted.
      */
-    private void LevelUp()
+    private void UpdateProbability(int val)
     {
-        const int change = 5;
-        
-        // When user successful produce 5 times (not include failed result),
-        // level up. Maximum proficiency level is 5 (12 times)
-        int lastProficiency = _proficiency;
-        _proficiency = (Level + _convertCount / Range) >= MaxLevel ? 
-            MaxLevel : Level + _convertCount / Range;
-        
-        // If proficiency change, update _probability
-        if (lastProficiency < _proficiency)
+        int change = UpdateValue;
+
+        if (val < Default)
+        {
+            change = -change;
+            val = -val;
+        }
+
+        for (int i = Default; i < val; i++)
         {
             _currentProbability[FailProb] -= change;
             _currentProbability[PartProb] -= change;
