@@ -240,6 +240,21 @@ public class Formula
 
     }
     
+    public Formula(Formula other)
+    {
+        // Here copy all parameters, for example:
+        _inputMaterials = other._inputMaterials.Select(
+            material => new Material(material.Name, material.Quantity)).ToArray();
+        _outputMaterials = other._outputMaterials.Select(
+            material => new Material(material.Name, material.Quantity)).ToArray();
+    
+        // Copy other fields
+        _proficiency = other._proficiency;
+        _produceRate = (double[])other._produceRate.Clone();
+        _probability = (double[])other._probability.Clone();
+        _currentProbability = (double[])other._currentProbability.Clone();
+    }
+    
     // -‘Produce’
     /*      Simulates the production process and returns the produce rate.
      *      ** Precondition:
