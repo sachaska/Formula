@@ -35,14 +35,13 @@ using System;
 // /// </summary>
 public class Plan
 {
-    protected Formula[] Sequences;  // holds Formula list
-    public const int Index = 1;     // constant index value
-    public const int AddNew = 1;    // constant add index
-    public const int Default = 0;   // constant default value
-    
+    public Formula[] Sequences; // holds Formula list
+    protected const int Index = 1; // constant index value
+    protected const int Default = 0; // constant default value
+
     // - Default Constructor
     /*      ** Precondition:
-     *          None.
+     *          N/A
      *      ** Postcondition:
      *          A Plan instance is created with an empty list of formulas
      *      initialized.
@@ -51,13 +50,13 @@ public class Plan
     {
         Sequences = Array.Empty<Formula>();
     }
-    
+
     // - Overloaded Constructor
     /*      ** Precondition:
      *          The passed in list is not null.
-    *      ** Postcondition:
-    *          A Plan instance is created with each formula in the list
-    *          deep copied into the '_sequences' array.
+     *      ** Postcondition:
+     *          A Plan instance is created with each formula in the list
+     *          deep copied into the '_sequences' array.
      */
     public Plan(Formula[] list)
     {
@@ -70,11 +69,11 @@ public class Plan
             {
                 Sequences[i] = new Formula(list[i]);
             }
-            
+
         }
         else
             Sequences = Array.Empty<Formula>();
-        
+
     }
 
     // - Method to add a new formula to the Plan
@@ -83,17 +82,16 @@ public class Plan
      *      ** Postcondition:
      *          A deep copy of the new formula is added to the end of the
      *      '_sequences' array.
-     */    
+     */
     public void Add(Formula newFormula)
     {
         // Resize the _sequences array
-        int newSize = Sequences.Length + AddNew;
-        Array.Resize(ref Sequences, newSize);
-
-        // Add newFormula in the last position
-        Sequences[newSize - Index] = newFormula;
+        Sequences = Resize(Sequences, Sequences.Length + Index);
+        Sequences[^Index] =
+            newFormula ?? throw new ArgumentNullException(nameof(newFormula),
+                "New formula cannot be null.");
     }
-    
+
     // - Method to create a deep copy of the plan
     /*      ** Precondition:
      *          None.
@@ -101,19 +99,19 @@ public class Plan
      *          A Plan instance is created with deep copied formulas from the
      *      current Plan instance.
      */
-    public virtual Plan DeepCopy()
+    public Plan DeepCopy()
     {
-        var newPlan = new Plan();
-    
-        foreach (var formula in Sequences)
+        Plan newPlan = new Plan();
+
+        foreach (Formula formula in Sequences)
         {
             // Add a deep copy of each Formula in _sequences to the new Plan
-            newPlan.Add(new Formula(formula)); 
+            newPlan.Add(new Formula(formula));
         }
 
         return newPlan;
     }
-    
+
     // - Method to replace a formula in the Plan
     /*      ** Precondition:
      *          The index is not out of the '_sequences' array bounds, and the
@@ -124,17 +122,23 @@ public class Plan
      */
     public virtual void Replace(int index, Formula newFormula)
     {
+        if (newFormula == null)
+        {
+            throw new ArgumentNullException(nameof(newFormula),
+                "New formula cannot be null.");
+        }
+
         // Might want to add some boundary checks before attempting to replace
         if (index < Default || index >= Sequences.Length)
         {
-            throw new ArgumentOutOfRangeException(nameof(index), 
+            throw new ArgumentOutOfRangeException(nameof(index),
                 "Index out of range.");
         }
 
         // Deep copy of newFormula replaced at the specified index
         Sequences[index] = new Formula(newFormula);
     }
-    
+
     // - Method to remove the last formula in the Plan
     /*      ** Precondition:
      *          The '_sequences' array is not empty.
@@ -143,35 +147,88 @@ public class Plan
      */
     public virtual void Remove()
     {
-        if (Sequences.Length > Default)
-        {
-            // Resize the _sequences array
-            int newSize = Sequences.Length - AddNew;
-            Array.Resize(ref Sequences, newSize);
-        }
-        else
+        if (Sequences.Length == Default)
         {
             throw new InvalidOperationException
                 ("No formulas to remove.");
         }
+
+        Sequences = Resize(Sequences, Sequences.Length - Index);
+    }
+
+    // - Method to resize the '_sequences' array based on a new size
+    /*      ** Precondition:
+     *          The '_sequences' array is not null, and the new size is not negative.
+     *
+     *      ** Postcondition:
+     *          A new array is returned, which is a copy of the old '_sequences'
+     *          array rescaled to the provided new size.
+     */
+    private Formula[] Resize(Formula[] array, int newSize)
+    {
+        Formula[] newArray = new Formula[newSize];
+
+        for (int i = Default; i < Math.Min(array.Length, newSize); i++)
+        {
+            newArray[i] = array[i];
+        }
+
+        return newArray;
     }
 
     // - Method to represent the Plan as a string
     /*      ** Precondition: None
      *
      *      ** Postcondition:
-     *          A string representation of the Plan object is returned, quickly showing
-     *          its current state through the '_sequences' array.
+     *          A string representation of the Plan object is returned.
      */
     public override string ToString()
     {
         string result = "";
         for (int i = Default; i < Sequences.Length; i++)
         {
-            result += "(" + (i + Index) + ") " + Sequences[i].ToString() + "\n";
+            result += "(" + (i + Index) + ") " + Sequences[i] + "\n";
         }
+
         return result;
     }
+
+    // - Method to query the current formula
+    /*      ** Precondition: None
+     *
+     *      ** Postcondition:
+     *          A string representation of the current formula is returned,
+     *          or null if not available.
+     */
+    public virtual String Query()
+    {
+        return null;
+    }
+
+    // - Method to clone the current plan
+    /*      ** Precondition: None
+     *
+     *      ** Postcondition:
+     *          A clone of the Plan object is returned,
+     *          or null if not available.
+     */
+    public virtual Plan Clone()
+    {
+        return null;
+    }
+
+    // - Method to apply the current formula
+    /*      ** Precondition: None
+     *
+     *      ** Postcondition:
+     *          A string response to the apply action is returned,
+     *          or null if not available.
+     */
+    public virtual String Apply()
+    {
+        return null;
+    }
+
 }
 
 /*

@@ -25,12 +25,9 @@
  */
 namespace Formula;
 
-public class ExecutablePlan : Plan
+public class ExecutablePlan(Formula[] list) : Plan(list)
 {
     private int _current = Default;     // holds current step
-
-    
-    public int Current => _current;     // get current step
 
     // Applies the Formula at the current step and advances to the next
     /*      ** Precondition:
@@ -38,18 +35,26 @@ public class ExecutablePlan : Plan
      *      ** Postcondition:
      *          The Formula at the current step has been applied and the '_current'
      * value has been incremented. */
-    public void Apply()
+    public override String Apply()
     {
         // Check if there are any formulas left to apply
         if (_current >= Sequences.Length)
             throw new InvalidOperationException
                 ("Cannot advance beyond the end of the sequence.");
-
-        Sequences[_current].Apply();
-
         _current++;
+        
+        return Sequences[_current - Index].Apply();
     }
-    
+
+    // Returns a string format of the current formula. 
+    /* Precondition: '_current' points to a valid formula.
+     * Postcondition: Returns "[current index]. [current formula]".
+     */
+    public override String Query()
+    {
+        return $"({_current + Index}). {Sequences[_current]}";
+    }
+
     // Replaces a Formula at a specific step in the sequence
     /*      ** Precondition:
      *          The step (index) is not yet completed (i.e. '_current'
@@ -86,12 +91,15 @@ public class ExecutablePlan : Plan
      *      ** Postcondition:
      *          A new ExecutablePlan object which is a deep copy of the current
      * object is returned. */
-    public ExecutablePlan Clone()
+    public override ExecutablePlan Clone()
     {
-        ExecutablePlan clone = (ExecutablePlan)base.DeepCopy();
-        clone._current = _current;
-        return clone;
+        ExecutablePlan newPlan = new ExecutablePlan(Sequences);
+
+        newPlan._current = _current;
+        
+        return newPlan;
     }
+
 }
 
 /*

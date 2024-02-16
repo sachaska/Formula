@@ -3,13 +3,14 @@
 //   Platform: Rider (Mac)
 
 // Revision History:
-/*      - 2023, Jan 18 Ai Sun - Initial creation of the class.
-        - 2023, Jan 30 Ai Sun - Add comments and minimize the number of
+/*      - 2024, Jan 18 Ai Sun - Initial creation of the class.
+        - 2024, Jan 30 Ai Sun - Add comments and minimize the number of
         constructor.
-        - 2023, Jan 31 Ai Sun - change Clients should be able to increase 
+        - 2024, Jan 31 Ai Sun - change Clients should be able to increase 
                                 proficiency up to some maximum.
                                 add empty exception.
                                 delete variable convert count.
+        - 2024, Feb 15 Ai Sun - delete Proficiency setter, add increase function
  */
 
 // Process:
@@ -75,12 +76,12 @@ namespace Formula;
 /// </summary>
 public class Formula
 {
-    private const int Default = 0;                  // default integer value (0)
+    private const int Default = 0;         // default integer value (0)
     
-    private const int Level = 0;                   // starting proficiency level
-    private const int MaxLevel = 4;        // the maximum proficiency level
-    private const int MinLevel = 0;        // the minimum proficiency level
-    private const int UpdateValue = 5;     // for update probability
+    private const int Level = 0;           // starting proficiency level
+    private const int MaxLevel = 5;        // the maximum proficiency level
+    private readonly int[] _buff = { 0, 5, 6, 3 }; // for update probability
+    
     /// <summary>
     /// Class representing a material.
     /// Class Invariant: Name and quantity shouldn't be null.
@@ -147,13 +148,10 @@ public class Formula
     private readonly double[] _produceRate = [0, 0.75, 1, 1.1];
 
     // default probability
-    private readonly double[] _probability = [25, 20, 50, 5];
+    private double[] _probability = [25, 20, 50, 5];
     
     // index of each probability
     const int FailProb = 0, PartProb = 1, FullProb = 2, ExtraProb = 3;
-
-    // holds current probability
-    private readonly double[] _currentProbability;
 
     // holds formula input materials
     private readonly Material[] _inputMaterials;
@@ -165,31 +163,8 @@ public class Formula
     private int _proficiency;
     
     // set and get proficiency
-    public int Proficiency
-    {
-        set
-        {
-            int lastProf = _proficiency;
-            
-            if (value is < MinLevel or > MaxLevel)
-            {
-                throw new InvalidDataException("Proficiency " +
-                                               "valid range [0, 4].");
-            }
-            
-            _proficiency = value;
+    public int Proficiency => _proficiency;
 
-            if (_proficiency != lastProf)
-            {
-                int change = _proficiency - lastProf;
-                
-            }
-        }
-
-        get => _proficiency;
-    }
-    
-    
 
     // - Constructor
     /*      ** Precondition:
@@ -231,18 +206,15 @@ public class Formula
         
         for (int i = Default; i < outNames.Length; i++)
             _outputMaterials[i] = new Material(outNames[i], outQuantity[i]);
-        
-        // Initialize produce probability
-        _currentProbability = _probability;
 
         // Initialize produce proficiency
         _proficiency = Level;
 
     }
     
+    
     public Formula(Formula other)
     {
-        // Here copy all parameters, for example:
         _inputMaterials = other._inputMaterials.Select(
             material => new Material(material.Name, material.Quantity)).ToArray();
         _outputMaterials = other._outputMaterials.Select(
@@ -252,7 +224,6 @@ public class Formula
         _proficiency = other._proficiency;
         _produceRate = (double[])other._produceRate.Clone();
         _probability = (double[])other._probability.Clone();
-        _currentProbability = (double[])other._currentProbability.Clone();
     }
     
     // -‘Produce’
@@ -274,18 +245,18 @@ public class Formula
 
         int randomNumber = random.Next(min, max);
 
-        if (randomNumber < _currentProbability[FailProb])
+        if (randomNumber < _probability[FailProb])
             // Produce failed
             return _produceRate[FailProb];
         
-        if (randomNumber < _currentProbability[FailProb] +
-            _currentProbability[PartProb])
+        if (randomNumber < _probability[FailProb] +
+            _probability[PartProb])
             // Produce 3/4
             rate = _produceRate[PartProb];
 
-        else if (randomNumber < _currentProbability[FailProb] + 
-            _currentProbability[PartProb] +
-            _currentProbability[FullProb])
+        else if (randomNumber < _probability[FailProb] + 
+                 _probability[PartProb] +
+                 _probability[FullProb])
             // Produce 100%
             rate = _produceRate[FullProb];
         
@@ -303,24 +274,26 @@ public class Formula
      *      ** Postcondition:
      *         The probabilities are adjusted.
      */
-    private void UpdateProbability(int val)
+    public void Increase()
     {
-        int change = UpdateValue;
-
-        if (val < Default)
+        if (_proficiency < MaxLevel)
         {
-            change = -change;
-            val = -val;
+            _proficiency++;
+            
+            // change produce rate
+            for (int i = Default; i < _probability.Length; ++i)
+            {
+                _probability[i] -= _buff[i];
+            }
+            
+        }
+        else
+        {
+            throw new InvalidOperationException
+                ("This formula has reached the maximum level.");
         }
 
-        for (int i = Default; i < val; i++)
-        {
-            _currentProbability[FailProb] -= change;
-            _currentProbability[PartProb] -= change;
-            _currentProbability[FullProb] += change;
-            _currentProbability[ExtraProb] += change;
-        }
-        
+       
     }
 
     // -‘Apply’ 
