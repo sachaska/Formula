@@ -1,0 +1,12 @@
+/Users/sunai/RiderProjects/OOP/Formula/Formula/bin/Release/net8.0/Formula.deps.json
+/Users/sunai/RiderProjects/OOP/Formula/Formula/bin/Release/net8.0/Formula.dll
+/Users/sunai/RiderProjects/OOP/Formula/Formula/bin/Release/net8.0/Formula.pdb
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.AssemblyInfoInputs.cache
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.AssemblyInfo.cs
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.csproj.CoreCompileInputs.cache
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.sourcelink.json
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.dll
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/refint/Formula.dll
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/Formula.pdb
+/Users/sunai/RiderProjects/OOP/Formula/Formula/obj/Release/net8.0/ref/Formula.dll

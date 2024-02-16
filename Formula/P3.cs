@@ -80,10 +80,50 @@ public class P3
             plan.Remove();
             Console.WriteLine(plan.ToString());
 
+            Console.WriteLine($"******Remove out of range formula from {plan}******");
+            try
+            {
+                plan.Remove();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+            
             Console.WriteLine($"******Replace second formula from {plan}******");
             // Replace the formula at index 1 with a new formula
-            plan.Replace(1, new Formula.Formula(new string[] { "chocolate", "sugar" }, new int[] { 3, 2 }, new string[] { "brownie" }, new int[] { 20 }));
+            try
+            {
+                plan.Replace(1, new Formula.Formula(new string[] { "chocolate", "sugar" }, new int[] { 3, 2 }, new string[] { "brownie" }, new int[] { 20 }));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+            
             Console.WriteLine(plan.ToString());
+            
+            Console.WriteLine($"******Out range replace formula from {plan}******");
+            try
+            {
+                plan.Replace(10, new Formula.Formula(new string[] { "chocolate", "sugar" }, new int[] { 3, 2 }, new string[] { "brownie" }, new int[] { 20 }));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+            
+            Console.WriteLine($"******Add null formula to {plan}******");
+            try
+            {
+                plan.Add(null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+            
+            
             
             Console.WriteLine($"******Call Query function from {plan}******");
             Console.WriteLine($"******Call Apply function from {plan}******");

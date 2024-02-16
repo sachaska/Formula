@@ -32,6 +32,9 @@ using System;
 // /// Class representing a plan of formulas.
 // /// Class Invariant: The '_sequences' list must always contain
 // deep copied formulas.
+// This class have a child class ExecutablePlan.
+// Apply, Clone, Query functions are implemented. 
+// Complete apply formula's remove/replace is not allowed in ExecutablePlan.
 // /// </summary>
 public class Plan
 {
@@ -83,7 +86,7 @@ public class Plan
      *          A deep copy of the new formula is added to the end of the
      *      '_sequences' array.
      */
-    public void Add(Formula newFormula)
+    public void Add(Formula? newFormula)
     {
         // Resize the _sequences array
         Sequences = Resize(Sequences, Sequences.Length + Index);

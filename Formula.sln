@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula", "Formula\Formula.csproj", "{39FC1091-DDC4-46FD-AC5E-3F7C6603703B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula.Tests", "Formula.Tests\Formula.Tests.csproj", "{450846F4-AA47-4BD9-AA93-38B5043702A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{39FC1091-DDC4-46FD-AC5E-3F7C6603703B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39FC1091-DDC4-46FD-AC5E-3F7C6603703B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39FC1091-DDC4-46FD-AC5E-3F7C6603703B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39FC1091-DDC4-46FD-AC5E-3F7C6603703B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39FC1091-DDC4-46FD-AC5E-3F7C6603703B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{450846F4-AA47-4BD9-AA93-38B5043702A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{450846F4-AA47-4BD9-AA93-38B5043702A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+EndGlobal

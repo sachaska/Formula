@@ -9,12 +9,14 @@
 // Process:
 /*      An ExecutablePlan object is created by the user, stores a dynamic list of Formula(s)
  *      The user can interact with the instance by adding, replacing formula(s),
- *      removing the last one, or making a deep copy of the ExecutablePlan instance
+ *      removing the last one, or making a deep copy of the ExecutablePlan instance.
  */
 
 // Assumptions:
 /*      1. The index for 'Replace' method should not be out of range of the Formula list
  *      2. There should be at least one formula in the list when 'Remove' method is invoked
+ *      3. The Formulas could just apply for one round and one round only. No
+ *      reset option.
  */
 
 // Use and Validity (Error Processing):
